@@ -1,0 +1,58 @@
+from google.colab import userdata
+import numpy as np
+import pandas as pd
+import sklearn
+from google.colab import drive
+drive.mount('/content/drive')
+import pandas as pd
+
+file_path = '/content/drive/MyDrive/Datasets/combined_data.csv'
+df = pd.read_csv(file_path)
+
+# Split the dataset into features (X) and labels (y)
+X = df['text']
+y = df['label']
+
+# Preprocess the text data (optional)
+# Perform any necessary preprocessing steps on the text data, such as removing stopwords, applying stemming/lemmatization, or handling missing values.
+
+# Split the data into training and testing sets
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Vectorize the text data
+from sklearn.feature_extraction.text import CountVectorizer
+
+vectorizer = CountVectorizer()
+X_train_transformed = vectorizer.fit_transform(X_train)
+X_test_transformed = vectorizer.transform(X_test)
+
+# Train a Naive Bayes classifier
+from sklearn.naive_bayes import MultinomialNB
+
+classifier = MultinomialNB()
+classifier.fit(X_train_transformed, y_train)
+
+# Make predictions on the test set
+y_pred = classifier.predict(X_test_transformed)
+
+# Evaluate the model
+from sklearn.metrics import accuracy_score
+
+accuracy = accuracy_score(y_test, y_pred)
+print('Accuracy:', accuracy)
+
+# Count the number of ham and spam emails in the dataset
+num_ham = df[df['label'] == 0].shape[0]
+num_spam = df[df['label'] == 1].shape[0]
+print('Number of ham emails:', num_ham)
+print('Number of spam emails:', num_spam)
+
+# Display example ham and spam emails
+ham_samples = df[df['label'] == 0].sample(5)
+spam_samples = df[df['label'] == 1].sample(5)
+print('Example ham emails:')
+print(ham_samples['text'])
+print('Example spam emails:')
+print(spam_samples['text'])
